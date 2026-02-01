@@ -1,0 +1,75 @@
+/* Blackjack Helper Overlay Styles */
+
+.bj-helper-overlay {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 300px;
+  background-color: rgba(30, 30, 30, 0.95);
+  border: 2px solid #4CAF50;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  z-index: 999999;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #ffffff;
+}
+
+.bj-helper-header {
+  background-color: #4CAF50;
+  padding: 12px 15px;
+  border-radius: 6px 6px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bj-helper-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.bj-helper-close {
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.bj-helper-close:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.bj-helper-content {
+  padding: 15px;
+}
+
+.bj-helper-panel {
+  background-color: rgba(50, 50, 50, 0.8);
+  border-radius: 4px;
+  padding: 12px;
+}
+
+.bj-helper-status {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #4CAF50;
+}
+
+.bj-helper-info {
+  margin: 0;
+  font-size: 13px;
+  color: #cccccc;
+  line-height: 1.5;
+}
