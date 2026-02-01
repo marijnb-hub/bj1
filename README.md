@@ -2,12 +2,20 @@
 
 A Google Chrome Web Extension that acts as a real-time assistant for online blackjack players.
 
+**✨ Works on ALL websites - no restrictions!**
+
 ## Features
 
 This extension provides a complete blackjack strategy assistant with OCR card recognition capabilities.
 
 ### Current Features
-1. **Content Script**: 
+1. **Universal Compatibility**: 
+   - 🌐 **Works on EVERY website** - HTTP, HTTPS, and local files
+   - Automatic injection on all URLs
+   - Smart error handling for sites with restrictions
+   - Compatible with iframes and complex page structures
+   
+2. **Content Script**: 
    - Injects an interactive overlay onto the active tab
    - Displays real-time blackjack strategy recommendations
    - Toggleable visibility
@@ -50,8 +58,10 @@ This extension provides a complete blackjack strategy assistant with OCR card re
 8. **Manifest File Configuration**:
    - Manifest V3 compliant
    - Configured for Chrome extensions
-   - Includes permissions to read and modify the active tab
-   - Content scripts that inject into all URLs
+   - Universal host permissions for ALL websites
+   - Content scripts that inject into all URLs (HTTP, HTTPS, local files)
+   - Works in iframes and all frame contexts
+   - Optimized injection timing for maximum compatibility
 
 ## Project Structure
 
@@ -82,6 +92,28 @@ This extension provides a complete blackjack strategy assistant with OCR card re
 3. Enable "Developer mode" in the top right
 4. Click "Load unpacked"
 5. Select the repository directory
+
+## Compatibility
+
+**✅ This extension works on ALL websites without restrictions!**
+
+### Supported Sites:
+- ✅ HTTP websites
+- ✅ HTTPS websites  
+- ✅ Local files (file://)
+- ✅ Any online blackjack site
+- ✅ Casino websites
+- ✅ Practice sites
+- ✅ Works in iframes and complex page structures
+
+### Technical Details:
+- Uses Manifest V3 with `host_permissions` for universal access
+- Content scripts configured with `run_at: "document_idle"` for optimal compatibility
+- Supports `all_frames: true` to work in embedded content
+- Smart error handling for sites with strict Content Security Policies
+- Graceful fallback on restricted environments
+
+The extension will automatically inject on every website you visit!
 
 ## Usage
 

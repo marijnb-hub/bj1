@@ -8,6 +8,9 @@
     "scripting",
     "tabs"
   ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
   "background": {
     "service_worker": "scripts/background.js"
   },
@@ -28,7 +31,9 @@
     {
       "matches": ["<all_urls>"],
       "js": ["scripts/logic.js", "scripts/ocr.js", "scripts/content.js"],
-      "css": ["styles/overlay.css"]
+      "css": ["styles/overlay.css"],
+      "run_at": "document_idle",
+      "all_frames": true
     }
   ]
 }

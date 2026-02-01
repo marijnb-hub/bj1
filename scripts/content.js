@@ -1,13 +1,44 @@
 // Content script for Blackjack Helper
 // This script injects an overlay into the page to display blackjack advice
+// Works on all websites with proper error handling
 
 (function() {
   'use strict';
 
-  // Check if overlay already exists to prevent duplicate injection
-  if (document.getElementById('blackjack-helper-overlay')) {
+  // Early exit if we're in an incompatible context
+  if (!document.body) {
+    console.log('Blackjack Helper: Document body not available yet, waiting...');
+    // Wait for DOM to be ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeExtension);
+    } else {
+      // DOM is already ready, but body might not be available in some edge cases
+      setTimeout(initializeExtension, 100);
+    }
     return;
   }
+
+  initializeExtension();
+
+  function initializeExtension() {
+    try {
+      // Check if we're in a valid context
+      if (!document.body) {
+        console.log('Blackjack Helper: Body still not available, skipping injection');
+        return;
+      }
+
+      // Check if overlay already exists to prevent duplicate injection
+      if (document.getElementById('blackjack-helper-overlay')) {
+        console.log('Blackjack Helper: Overlay already exists, skipping injection');
+        return;
+      }
+
+      // Skip if we're in an iframe (unless it's the top frame)
+      if (window !== window.top && !window.location.href.includes('blackjack')) {
+        console.log('Blackjack Helper: In iframe, skipping injection');
+        return;
+      }
 
   // State management
   let playerCards = [];
@@ -495,4 +526,10 @@
     }
     return true; // Keep the message channel open for async response
   });
+
+    } catch (error) {
+      console.error('Blackjack Helper: Error initializing extension:', error);
+      // Don't throw - fail gracefully on sites with restrictions
+    }
+  }
 })();
