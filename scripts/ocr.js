@@ -77,7 +77,7 @@ async function recognizeCards(imageData) {
     
     // Execute OCR in page context and get results
     return new Promise((resolve, reject) => {
-      const callbackId = 'ocr_callback_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      const callbackId = 'ocr_callback_' + Date.now() + '_' + Math.random().toString(36).substring(2, 11);
       
       // Set up callback to receive results
       window[callbackId] = (result) => {
@@ -91,6 +91,9 @@ async function recognizeCards(imageData) {
         }
       };
       
+      // Safely escape imageData to prevent XSS
+      const safeImageData = JSON.stringify(imageData);
+      
       // Inject OCR execution into page context
       const script = document.createElement('script');
       script.textContent = `
@@ -100,6 +103,8 @@ async function recognizeCards(imageData) {
               window['${callbackId}']({ error: 'Tesseract not loaded' });
               return;
             }
+            
+            const imageData = ${safeImageData};
             
             const worker = await Tesseract.createWorker('eng', 1, {
               logger: m => console.log('Tesseract:', m),
@@ -111,7 +116,7 @@ async function recognizeCards(imageData) {
               tessedit_char_whitelist: '23456789JQKA10',
             });
             
-            const { data: { text } } = await worker.recognize('${imageData}');
+            const { data: { text } } = await worker.recognize(imageData);
             await worker.terminate();
             
             window['${callbackId}']({ text: text });
