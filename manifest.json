@@ -23,7 +23,7 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["scripts/logic.js", "scripts/content.js"],
+      "js": ["scripts/logic.js", "scripts/ocr.js", "scripts/content.js"],
       "css": ["styles/overlay.css"]
     }
   ]

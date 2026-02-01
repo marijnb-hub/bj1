@@ -28,19 +28,43 @@
   content.className = 'bj-helper-content';
   content.innerHTML = `
     <div class="bj-helper-panel">
-      <div class="bj-input-section">
-        <label class="bj-label">Your Cards:</label>
-        <div class="bj-card-input">
-          <input type="text" id="bj-player-cards" placeholder="e.g., 10,7 or K,A" class="bj-input">
-          <button id="bj-add-card" class="bj-btn-small">Add Card</button>
+      <div class="bj-tabs">
+        <button id="bj-tab-manual" class="bj-tab active">Manual Input</button>
+        <button id="bj-tab-ocr" class="bj-tab">OCR Recognition</button>
+      </div>
+      
+      <div id="bj-manual-panel" class="bj-tab-panel active">
+        <div class="bj-input-section">
+          <label class="bj-label">Your Cards:</label>
+          <div class="bj-card-input">
+            <input type="text" id="bj-player-cards" placeholder="e.g., 10,7 or K,A" class="bj-input">
+            <button id="bj-add-card" class="bj-btn-small">Add Card</button>
+          </div>
+          <div id="bj-player-display" class="bj-card-display"></div>
+          
+          <label class="bj-label">Dealer Card:</label>
+          <input type="text" id="bj-dealer-card" placeholder="e.g., 7 or K" class="bj-input">
+          
+          <button id="bj-calculate" class="bj-btn-primary">Calculate</button>
+          <button id="bj-clear" class="bj-btn-secondary">Clear</button>
         </div>
-        <div id="bj-player-display" class="bj-card-display"></div>
-        
-        <label class="bj-label">Dealer Card:</label>
-        <input type="text" id="bj-dealer-card" placeholder="e.g., 7 or K" class="bj-input">
-        
-        <button id="bj-calculate" class="bj-btn-primary">Calculate</button>
-        <button id="bj-clear" class="bj-btn-secondary">Clear</button>
+      </div>
+      
+      <div id="bj-ocr-panel" class="bj-tab-panel">
+        <div class="bj-input-section">
+          <label class="bj-label">Upload Card Image:</label>
+          <input type="file" id="bj-image-upload" accept="image/*" class="bj-file-input">
+          <button id="bj-process-image" class="bj-btn-primary" style="width: 100%;">Process Image</button>
+          
+          <div id="bj-ocr-status" class="bj-ocr-status"></div>
+          <div id="bj-ocr-preview" class="bj-ocr-preview"></div>
+          
+          <div id="bj-ocr-results" class="bj-ocr-results" style="display: none;">
+            <label class="bj-label">Detected Cards:</label>
+            <div id="bj-detected-cards" class="bj-card-display"></div>
+            <button id="bj-use-detected" class="bj-btn-primary" style="width: 100%;">Use These Cards</button>
+          </div>
+        </div>
       </div>
       
       <div id="bj-results" class="bj-results-section" style="display: none;">
@@ -92,6 +116,17 @@
     const addCardBtn = document.getElementById('bj-add-card');
     const playerCardsInput = document.getElementById('bj-player-cards');
     const dealerCardInput = document.getElementById('bj-dealer-card');
+    
+    // Tab switching
+    const manualTab = document.getElementById('bj-tab-manual');
+    const ocrTab = document.getElementById('bj-tab-ocr');
+    const manualPanel = document.getElementById('bj-manual-panel');
+    const ocrPanel = document.getElementById('bj-ocr-panel');
+    
+    // OCR elements
+    const imageUpload = document.getElementById('bj-image-upload');
+    const processImageBtn = document.getElementById('bj-process-image');
+    const useDetectedBtn = document.getElementById('bj-use-detected');
 
     if (calculateBtn) {
       calculateBtn.addEventListener('click', calculateStrategy);
@@ -103,6 +138,32 @@
 
     if (addCardBtn) {
       addCardBtn.addEventListener('click', addPlayerCard);
+    }
+    
+    // Tab switching
+    if (manualTab && ocrTab) {
+      manualTab.addEventListener('click', () => {
+        manualTab.classList.add('active');
+        ocrTab.classList.remove('active');
+        manualPanel.classList.add('active');
+        ocrPanel.classList.remove('active');
+      });
+      
+      ocrTab.addEventListener('click', () => {
+        ocrTab.classList.add('active');
+        manualTab.classList.remove('active');
+        ocrPanel.classList.add('active');
+        manualPanel.classList.remove('active');
+      });
+    }
+    
+    // OCR functionality
+    if (processImageBtn) {
+      processImageBtn.addEventListener('click', processImage);
+    }
+    
+    if (useDetectedBtn) {
+      useDetectedBtn.addEventListener('click', useDetectedCards);
     }
 
     // Allow Enter key to calculate
@@ -245,6 +306,87 @@
     playerCards = [];
     dealerCard = '';
     updatePlayerDisplay();
+  }
+  
+  // OCR Functions
+  let detectedPlayerCards = [];
+  let detectedDealerCard = '';
+  
+  async function processImage() {
+    const fileInput = document.getElementById('bj-image-upload');
+    const statusDiv = document.getElementById('bj-ocr-status');
+    const previewDiv = document.getElementById('bj-ocr-preview');
+    const resultsDiv = document.getElementById('bj-ocr-results');
+    const detectedCardsDiv = document.getElementById('bj-detected-cards');
+    
+    if (!fileInput.files || fileInput.files.length === 0) {
+      statusDiv.innerHTML = '<p class="bj-error">Please select an image file</p>';
+      return;
+    }
+    
+    const file = fileInput.files[0];
+    
+    try {
+      // Show loading status
+      statusDiv.innerHTML = '<p class="bj-loading">Processing image... This may take a moment.</p>';
+      previewDiv.innerHTML = '';
+      resultsDiv.style.display = 'none';
+      
+      // Show image preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.style.maxWidth = '100%';
+        img.style.borderRadius = '4px';
+        previewDiv.appendChild(img);
+      };
+      reader.readAsDataURL(file);
+      
+      // Process with OCR
+      const cards = await processImageFile(file);
+      
+      if (cards.length === 0) {
+        statusDiv.innerHTML = '<p class="bj-error">No cards detected. Try a clearer image.</p>';
+        return;
+      }
+      
+      // Assume first 2 cards are player cards, last is dealer (if 3+ cards)
+      if (cards.length >= 2) {
+        detectedPlayerCards = cards.slice(0, -1);
+        detectedDealerCard = cards[cards.length - 1];
+      } else {
+        detectedPlayerCards = cards;
+        detectedDealerCard = '';
+      }
+      
+      // Display results
+      statusDiv.innerHTML = '<p class="bj-success">Cards detected successfully!</p>';
+      detectedCardsDiv.innerHTML = `
+        <strong>Player:</strong> ${detectedPlayerCards.join(', ')}<br>
+        ${detectedDealerCard ? '<strong>Dealer:</strong> ' + detectedDealerCard : ''}
+      `;
+      resultsDiv.style.display = 'block';
+      
+    } catch (error) {
+      console.error('OCR processing error:', error);
+      statusDiv.innerHTML = `<p class="bj-error">Error: ${error.message}</p>`;
+    }
+  }
+  
+  function useDetectedCards() {
+    playerCards = [...detectedPlayerCards];
+    dealerCard = detectedDealerCard;
+    
+    // Switch to manual tab and show results
+    document.getElementById('bj-tab-manual').click();
+    
+    // Update inputs
+    document.getElementById('bj-player-cards').value = '';
+    document.getElementById('bj-dealer-card').value = detectedDealerCard;
+    
+    // Calculate immediately
+    calculateStrategy();
   }
 
   // Initialize after DOM is ready
