@@ -1,43 +1,71 @@
 // OCR module for card recognition using Tesseract.js
 // This module handles image-based card detection
 
-// Note: Tesseract.js will be loaded from CDN in the content script
+// Note: Tesseract.js will be loaded from CDN by injecting into page context
+// This is necessary because Manifest V3 content scripts cannot load external scripts directly
 
 /**
  * Initialize OCR functionality
  * @returns {Promise} - Resolves when Tesseract is ready
  */
 async function initializeOCR() {
-  // Check if Tesseract is available
-  if (typeof Tesseract === 'undefined') {
-    console.log('Loading Tesseract.js from CDN...');
-    return loadTesseractScript();
-  }
-  return Promise.resolve();
-}
-
-/**
- * Load Tesseract.js script dynamically
- * @returns {Promise} - Resolves when script is loaded
- */
-function loadTesseractScript() {
+  // Check if Tesseract is available in page context
   return new Promise((resolve, reject) => {
+    // Check if already loaded
+    const checkTesseract = () => {
+      try {
+        // Try to access Tesseract from page context
+        const script = document.createElement('script');
+        script.textContent = 'window.__tesseractLoaded = typeof Tesseract !== "undefined";';
+        document.documentElement.appendChild(script);
+        script.remove();
+        
+        if (window.__tesseractLoaded) {
+          console.log('Tesseract.js already available');
+          resolve();
+          return true;
+        }
+      } catch (e) {
+        console.log('Tesseract not yet available');
+      }
+      return false;
+    };
+    
+    if (checkTesseract()) {
+      return;
+    }
+    
+    console.log('Loading Tesseract.js from CDN into page context...');
+    
+    // Inject script into page context (not content script context)
     const script = document.createElement('script');
     script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js';
+    script.crossOrigin = 'anonymous';
+    
     script.onload = () => {
       console.log('Tesseract.js loaded successfully');
-      resolve();
+      // Wait a bit for initialization
+      setTimeout(() => {
+        if (checkTesseract()) {
+          resolve();
+        } else {
+          reject(new Error('Tesseract loaded but not accessible'));
+        }
+      }, 100);
     };
-    script.onerror = () => {
-      console.error('Failed to load Tesseract.js');
-      reject(new Error('Failed to load Tesseract.js'));
+    
+    script.onerror = (error) => {
+      console.error('Failed to load Tesseract.js', error);
+      reject(new Error('Failed to load Tesseract.js. Check network connection and CORS settings.'));
     };
-    document.head.appendChild(script);
+    
+    // Append to page's head (not extension context)
+    (document.head || document.documentElement).appendChild(script);
   });
 }
 
 /**
- * Process an image and extract card values
+ * Process an image and extract card values using page context
  * @param {string} imageData - Base64 image data or image URL
  * @returns {Promise<Array>} - Array of detected card values
  */
@@ -46,22 +74,64 @@ async function recognizeCards(imageData) {
     await initializeOCR();
     
     console.log('Starting OCR recognition...');
-    const worker = await Tesseract.createWorker();
     
-    await worker.loadLanguage('eng');
-    await worker.initialize('eng');
-    await worker.setParameters({
-      tessedit_char_whitelist: '23456789JQKA10',
+    // Execute OCR in page context and get results
+    return new Promise((resolve, reject) => {
+      const callbackId = 'ocr_callback_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      
+      // Set up callback to receive results
+      window[callbackId] = (result) => {
+        delete window[callbackId];
+        if (result.error) {
+          reject(new Error(result.error));
+        } else {
+          console.log('OCR recognized text:', result.text);
+          const cards = parseCardText(result.text);
+          resolve(cards);
+        }
+      };
+      
+      // Inject OCR execution into page context
+      const script = document.createElement('script');
+      script.textContent = `
+        (async function() {
+          try {
+            if (typeof Tesseract === 'undefined') {
+              window['${callbackId}']({ error: 'Tesseract not loaded' });
+              return;
+            }
+            
+            const worker = await Tesseract.createWorker('eng', 1, {
+              logger: m => console.log('Tesseract:', m),
+              workerPath: 'https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/worker.min.js',
+              corePath: 'https://cdn.jsdelivr.net/npm/tesseract.js-core@4/tesseract-core.wasm.js',
+            });
+            
+            await worker.setParameters({
+              tessedit_char_whitelist: '23456789JQKA10',
+            });
+            
+            const { data: { text } } = await worker.recognize('${imageData}');
+            await worker.terminate();
+            
+            window['${callbackId}']({ text: text });
+          } catch (error) {
+            window['${callbackId}']({ error: error.message || 'OCR processing failed' });
+          }
+        })();
+      `;
+      
+      (document.head || document.documentElement).appendChild(script);
+      script.remove();
+      
+      // Timeout after 30 seconds
+      setTimeout(() => {
+        if (window[callbackId]) {
+          delete window[callbackId];
+          reject(new Error('OCR timeout - processing took too long'));
+        }
+      }, 30000);
     });
-    
-    const { data: { text } } = await worker.recognize(imageData);
-    await worker.terminate();
-    
-    console.log('OCR recognized text:', text);
-    
-    // Parse recognized text to extract card values
-    const cards = parseCardText(text);
-    return cards;
     
   } catch (error) {
     console.error('OCR recognition error:', error);

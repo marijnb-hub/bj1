@@ -162,10 +162,38 @@ Future enhancements could include:
 - **manifest.json**: Defines the extension's metadata, permissions, and configuration
 - **content.js**: Main script that injects the interactive overlay and handles user interactions
 - **logic.js**: Complete blackjack strategy engine with basic strategy, odds, and EV calculations
-- **ocr.js**: OCR module using Tesseract.js for card recognition from images
+- **ocr.js**: OCR module using Tesseract.js for card recognition from images (loads from CDN in page context)
+- **background.js**: Background service worker for screen capture functionality
 - **overlay.css**: Comprehensive styling for the overlay with tabs, inputs, and results visualization
 - **popup.html**, **popup.js**, **popup.css**: The popup interface for the extension
 - **test.html**: Test page for demonstrating the extension
+
+## Troubleshooting
+
+### OCR Issues
+
+**Problem**: "Failed to load Tesseract.js" error
+
+**Solution**: 
+The extension loads Tesseract.js from CDN (cdn.jsdelivr.net) dynamically in the page context to work around Chrome Manifest V3 restrictions. If you experience OCR loading issues:
+
+1. **Check Network Connection**: Ensure you have internet access to download Tesseract.js from the CDN
+2. **Check Browser Console**: Open DevTools (F12) → Console tab to see detailed error messages
+3. **CORS Issues**: The extension injects Tesseract.js into the page context, which should avoid most CORS issues
+4. **Firewall/Network Restrictions**: If your network blocks CDN access, you may need to allowlist `cdn.jsdelivr.net`
+5. **Wait for Loading**: First-time OCR use may take a few seconds to download and initialize Tesseract.js
+
+**Technical Details**:
+- Tesseract.js is loaded from: `https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js`
+- Worker files are loaded from the same CDN
+- The extension uses page context injection to bypass Manifest V3 CSP restrictions
+
+### Screen Capture Issues
+
+If screen capture isn't working:
+1. Ensure you've granted the extension the necessary permissions
+2. Try refreshing the page after installing the extension
+3. Check that you're on a supported protocol (HTTP/HTTPS)
 
 ## Version
 
