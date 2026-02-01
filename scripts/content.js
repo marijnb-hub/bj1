@@ -351,7 +351,9 @@
         return;
       }
       
-      // Assume first 2 cards are player cards, last is dealer (if 3+ cards)
+      // Card assignment logic: assumes first N-1 cards are player cards,
+      // and the last card is the dealer's upcard (for images with 3+ cards)
+      // For 1-2 cards, all are treated as player cards
       if (cards.length >= 2) {
         detectedPlayerCards = cards.slice(0, -1);
         detectedDealerCard = cards[cards.length - 1];

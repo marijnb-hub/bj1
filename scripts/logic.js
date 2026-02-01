@@ -155,6 +155,9 @@ function calculateExpectedValue(playerCards, dealerCard) {
   }
   
   // Calculate EV for hitting (simplified)
+  // Bust probability based on current total: (total - 11) / 13
+  // where 11 is the minimum total to potentially bust on next card,
+  // and 13 is the number of different card ranks (A-K)
   const bustProb = hand.total >= 12 ? (hand.total - 11) / 13 : 0;
   evHit = (1 - bustProb) * 0.1 - bustProb;
   
