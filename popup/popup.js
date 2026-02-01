@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Check if on a restricted page
       if (isRestrictedPage(tab.url)) {
-        statusText.textContent = 'Cannot run on Chrome internal pages';
+        statusText.textContent = 'Not available on Chrome pages';
         return;
       }
       
@@ -113,16 +113,14 @@ function updateStatus() {
       return;
     }
     
-    // Try to check overlay status
+    // Try to check overlay status without toggling
     statusText.textContent = 'Checking...';
     
     try {
-      const response = await sendMessageWithRetry(tab.id, { action: 'toggleOverlay' }, 2, 300);
+      const response = await sendMessageWithRetry(tab.id, { action: 'getStatus' }, 2, 300);
       
-      if (response && response.visible !== undefined) {
-        // Toggle back to original state since we were just checking
-        await sendMessageWithRetry(tab.id, { action: 'toggleOverlay' }, 1, 100);
-        statusText.textContent = 'Ready';
+      if (response && response.exists) {
+        statusText.textContent = response.visible ? 'Overlay visible' : 'Overlay hidden';
       } else {
         statusText.textContent = 'Overlay loading...';
       }

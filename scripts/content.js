@@ -540,6 +540,15 @@
       } else {
         sendResponse({ visible: false });
       }
+    } else if (request.action === 'getStatus') {
+      // Check if overlay exists and get its current state without modifying it
+      const overlay = document.getElementById('blackjack-helper-overlay');
+      if (overlay) {
+        const isVisible = overlay.style.display !== 'none';
+        sendResponse({ exists: true, visible: isVisible });
+      } else {
+        sendResponse({ exists: false, visible: false });
+      }
     }
     return true; // Keep the message channel open for async response
   });
