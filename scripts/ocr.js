@@ -102,6 +102,31 @@ function isValidCard(card) {
 }
 
 /**
+ * Capture full screen screenshot
+ * @returns {Promise<string>} - Base64 image data
+ */
+async function captureFullScreen() {
+  return new Promise((resolve, reject) => {
+    try {
+      chrome.runtime.sendMessage(
+        { action: 'captureScreen' },
+        response => {
+          if (response && response.imageData) {
+            resolve(response.imageData);
+          } else if (response && response.error) {
+            reject(new Error(response.error));
+          } else {
+            reject(new Error('Failed to capture screen'));
+          }
+        }
+      );
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+/**
  * Capture screenshot of specified area
  * @param {number} x - X coordinate
  * @param {number} y - Y coordinate
@@ -232,6 +257,8 @@ if (typeof module !== 'undefined' && module.exports) {
     recognizeCards,
     processImageFile,
     selectScreenRegion,
+    captureFullScreen,
+    captureArea,
     isValidCard
   };
 }

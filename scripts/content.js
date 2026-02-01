@@ -52,9 +52,16 @@
       
       <div id="bj-ocr-panel" class="bj-tab-panel">
         <div class="bj-input-section">
-          <label class="bj-label">Upload Card Image:</label>
-          <input type="file" id="bj-image-upload" accept="image/*" class="bj-file-input">
-          <button id="bj-process-image" class="bj-btn-primary" style="width: 100%;">Process Image</button>
+          <label class="bj-label">Automatic Card Detection:</label>
+          <p class="bj-info-text">Click the button below to automatically detect cards from the screen.</p>
+          
+          <button id="bj-capture-screen" class="bj-btn-primary" style="width: 100%; margin-bottom: 10px;">
+            📸 Capture & Detect Cards
+          </button>
+          
+          <button id="bj-select-region" class="bj-btn-secondary" style="width: 100%;">
+            🎯 Select Region & Detect
+          </button>
           
           <div id="bj-ocr-status" class="bj-ocr-status"></div>
           <div id="bj-ocr-preview" class="bj-ocr-preview"></div>
@@ -124,8 +131,8 @@
     const ocrPanel = document.getElementById('bj-ocr-panel');
     
     // OCR elements
-    const imageUpload = document.getElementById('bj-image-upload');
-    const processImageBtn = document.getElementById('bj-process-image');
+    const captureScreenBtn = document.getElementById('bj-capture-screen');
+    const selectRegionBtn = document.getElementById('bj-select-region');
     const useDetectedBtn = document.getElementById('bj-use-detected');
 
     if (calculateBtn) {
@@ -158,8 +165,12 @@
     }
     
     // OCR functionality
-    if (processImageBtn) {
-      processImageBtn.addEventListener('click', processImage);
+    if (captureScreenBtn) {
+      captureScreenBtn.addEventListener('click', captureAndDetect);
+    }
+    
+    if (selectRegionBtn) {
+      selectRegionBtn.addEventListener('click', selectRegionAndDetect);
     }
     
     if (useDetectedBtn) {
@@ -312,42 +323,33 @@
   let detectedPlayerCards = [];
   let detectedDealerCard = '';
   
-  async function processImage() {
-    const fileInput = document.getElementById('bj-image-upload');
+  async function captureAndDetect() {
     const statusDiv = document.getElementById('bj-ocr-status');
     const previewDiv = document.getElementById('bj-ocr-preview');
     const resultsDiv = document.getElementById('bj-ocr-results');
     const detectedCardsDiv = document.getElementById('bj-detected-cards');
     
-    if (!fileInput.files || fileInput.files.length === 0) {
-      statusDiv.innerHTML = '<p class="bj-error">Please select an image file</p>';
-      return;
-    }
-    
-    const file = fileInput.files[0];
-    
     try {
       // Show loading status
-      statusDiv.innerHTML = '<p class="bj-loading">Processing image... This may take a moment.</p>';
+      statusDiv.innerHTML = '<p class="bj-loading">📸 Capturing screen and detecting cards... This may take a moment.</p>';
       previewDiv.innerHTML = '';
       resultsDiv.style.display = 'none';
       
+      // Capture the screen
+      const imageData = await captureFullScreen();
+      
       // Show image preview
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = document.createElement('img');
-        img.src = e.target.result;
-        img.style.maxWidth = '100%';
-        img.style.borderRadius = '4px';
-        previewDiv.appendChild(img);
-      };
-      reader.readAsDataURL(file);
+      const img = document.createElement('img');
+      img.src = imageData;
+      img.style.maxWidth = '100%';
+      img.style.borderRadius = '4px';
+      previewDiv.appendChild(img);
       
       // Process with OCR
-      const cards = await processImageFile(file);
+      const cards = await recognizeCards(imageData);
       
       if (cards.length === 0) {
-        statusDiv.innerHTML = '<p class="bj-error">No cards detected. Try a clearer image.</p>';
+        statusDiv.innerHTML = '<p class="bj-error">No cards detected. Make sure cards are visible on the screen.</p>';
         return;
       }
       
@@ -363,7 +365,7 @@
       }
       
       // Display results
-      statusDiv.innerHTML = '<p class="bj-success">Cards detected successfully!</p>';
+      statusDiv.innerHTML = '<p class="bj-success">✅ Cards detected successfully!</p>';
       detectedCardsDiv.innerHTML = `
         <strong>Player:</strong> ${detectedPlayerCards.join(', ')}<br>
         ${detectedDealerCard ? '<strong>Dealer:</strong> ' + detectedDealerCard : ''}
@@ -371,7 +373,88 @@
       resultsDiv.style.display = 'block';
       
     } catch (error) {
-      console.error('OCR processing error:', error);
+      console.error('Screen capture error:', error);
+      statusDiv.innerHTML = `<p class="bj-error">Error: ${error.message}</p>`;
+    }
+  }
+  
+  async function selectRegionAndDetect() {
+    const statusDiv = document.getElementById('bj-ocr-status');
+    const previewDiv = document.getElementById('bj-ocr-preview');
+    const resultsDiv = document.getElementById('bj-ocr-results');
+    const detectedCardsDiv = document.getElementById('bj-detected-cards');
+    
+    try {
+      // Show instruction
+      statusDiv.innerHTML = '<p class="bj-loading">🎯 Click and drag to select the card region...</p>';
+      previewDiv.innerHTML = '';
+      resultsDiv.style.display = 'none';
+      
+      // Let user select region
+      const region = await selectScreenRegion();
+      
+      if (region.width < 10 || region.height < 10) {
+        statusDiv.innerHTML = '<p class="bj-error">Selected region too small. Please try again.</p>';
+        return;
+      }
+      
+      // Show loading status
+      statusDiv.innerHTML = '<p class="bj-loading">📸 Capturing selected region and detecting cards...</p>';
+      
+      // Capture the selected region
+      const imageData = await captureFullScreen();
+      
+      // Create a canvas to crop the selected region
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+        img.src = imageData;
+      });
+      
+      // Crop to selected region
+      canvas.width = region.width;
+      canvas.height = region.height;
+      ctx.drawImage(img, region.x, region.y, region.width, region.height, 0, 0, region.width, region.height);
+      const croppedImageData = canvas.toDataURL('image/png');
+      
+      // Show preview
+      const previewImg = document.createElement('img');
+      previewImg.src = croppedImageData;
+      previewImg.style.maxWidth = '100%';
+      previewImg.style.borderRadius = '4px';
+      previewDiv.appendChild(previewImg);
+      
+      // Process with OCR
+      const cards = await recognizeCards(croppedImageData);
+      
+      if (cards.length === 0) {
+        statusDiv.innerHTML = '<p class="bj-error">No cards detected in selected region. Try a different area.</p>';
+        return;
+      }
+      
+      // Card assignment logic
+      if (cards.length >= 2) {
+        detectedPlayerCards = cards.slice(0, -1);
+        detectedDealerCard = cards[cards.length - 1];
+      } else {
+        detectedPlayerCards = cards;
+        detectedDealerCard = '';
+      }
+      
+      // Display results
+      statusDiv.innerHTML = '<p class="bj-success">✅ Cards detected successfully!</p>';
+      detectedCardsDiv.innerHTML = `
+        <strong>Player:</strong> ${detectedPlayerCards.join(', ')}<br>
+        ${detectedDealerCard ? '<strong>Dealer:</strong> ' + detectedDealerCard : ''}
+      `;
+      resultsDiv.style.display = 'block';
+      
+    } catch (error) {
+      console.error('Region selection error:', error);
       statusDiv.innerHTML = `<p class="bj-error">Error: ${error.message}</p>`;
     }
   }

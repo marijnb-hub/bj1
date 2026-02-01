@@ -5,8 +5,12 @@
   "description": "A real-time assistant for online blackjack players",
   "permissions": [
     "activeTab",
-    "scripting"
+    "scripting",
+    "tabs"
   ],
+  "background": {
+    "service_worker": "scripts/background.js"
+  },
   "action": {
     "default_popup": "popup/popup.html",
     "default_icon": {
