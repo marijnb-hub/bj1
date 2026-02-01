@@ -21,8 +21,7 @@
   "license": "MIT",
   "devDependencies": {
     "electron": "^40.1.0",
-    "electron-builder": "^26.7.0",
-    "sharp": "^0.34.5"
+    "electron-builder": "^26.7.0"
   },
   "dependencies": {
     "tesseract.js": "^5.0.4"
