@@ -17,10 +17,12 @@ This extension provides a complete blackjack strategy assistant with OCR card re
    - Handles pairs, soft hands, and hard hands
    - Provides optimal action recommendations (hit, stand, double, split)
 
-3. **OCR Card Recognition**:
-   - Upload card images for automatic recognition using Tesseract.js
-   - Automatically detects card values from images
-   - Seamlessly integrates with strategy calculator
+3. **Automatic Screen Capture & OCR**:
+   - 📸 One-click screen capture for automatic card detection
+   - 🎯 Region selection to capture specific card areas
+   - Automatic card recognition using Tesseract.js
+   - No need to manually upload images
+   - Real-time visual preview of captured area
 
 4. **Odds and Expected Value Calculation**:
    - Real-time odds calculation for win/push/loss
@@ -94,11 +96,15 @@ This extension provides a complete blackjack strategy assistant with OCR card re
 3. Click "Calculate" to get strategy recommendations
 4. View the recommended action, odds, and expected values
 
-### OCR Recognition Mode
+### Automatic Card Detection Mode
 1. Click on the "OCR Recognition" tab
-2. Upload an image of the blackjack table showing cards
-3. Click "Process Image" to recognize cards
+2. Click "📸 Capture & Detect Cards" to automatically capture the entire screen
+   - OR -
+   Click "🎯 Select Region & Detect" to select a specific area with cards
+3. The extension will automatically detect and recognize cards
 4. Review detected cards and click "Use These Cards" to calculate strategy
+
+**No image upload needed!** The extension automatically sees the cards on your screen.
 
 ### Strategy Recommendations
 The extension provides recommendations based on basic blackjack strategy:
