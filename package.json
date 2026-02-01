@@ -1,0 +1,59 @@
+{
+  "name": "blackjack-helper-desktop",
+  "version": "1.0.0",
+  "description": "Blackjack Helper Desktop App - Card recognition with OCR and strategy advice",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux"
+  },
+  "keywords": [
+    "blackjack",
+    "ocr",
+    "strategy",
+    "electron",
+    "desktop"
+  ],
+  "author": "Blackjack Helper Team",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^40.1.0",
+    "electron-builder": "^26.7.0"
+  },
+  "dependencies": {
+    "tesseract.js": "^5.0.4"
+  },
+  "build": {
+    "appId": "com.blackjackhelper.desktop",
+    "productName": "Blackjack Helper",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "index.html",
+      "style.css",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.png"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "assets/icon.png"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "icon": "assets/icon.png",
+      "category": "Utility"
+    }
+  }
+}

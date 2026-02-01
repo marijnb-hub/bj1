@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blackjack Helper</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>♠️ Blackjack Helper ♣️</h1>
+      <p class="subtitle">Kaartherkenning met OCR en Strategieadvies</p>
+    </header>
+
+    <main>
+      <!-- Tab Navigation -->
+      <div class="tabs">
+        <button class="tab-button active" data-tab="manual">Handmatige Invoer</button>
+        <button class="tab-button" data-tab="ocr">OCR Scan</button>
+        <button class="tab-button" data-tab="strategy">Strategie Tabel</button>
+      </div>
+
+      <!-- Manual Input Tab -->
+      <div class="tab-content active" id="manual-tab">
+        <div class="card-input-section">
+          <div class="input-group">
+            <h3>Uw Kaarten</h3>
+            <div class="card-selector">
+              <label>Kaart 1:</label>
+              <select id="player-card-1" class="card-select">
+                <option value="">Selecteer kaart</option>
+                <option value="A♠">A♠</option>
+                <option value="A♥">A♥</option>
+                <option value="A♦">A♦</option>
+                <option value="A♣">A♣</option>
+                <option value="2♠">2♠</option>
+                <option value="2♥">2♥</option>
+                <option value="2♦">2♦</option>
+                <option value="2♣">2♣</option>
+                <option value="3♠">3♠</option>
+                <option value="3♥">3♥</option>
+                <option value="3♦">3♦</option>
+                <option value="3♣">3♣</option>
+                <option value="4♠">4♠</option>
+                <option value="4♥">4♥</option>
+                <option value="4♦">4♦</option>
+                <option value="4♣">4♣</option>
+                <option value="5♠">5♠</option>
+                <option value="5♥">5♥</option>
+                <option value="5♦">5♦</option>
+                <option value="5♣">5♣</option>
+                <option value="6♠">6♠</option>
+                <option value="6♥">6♥</option>
+                <option value="6♦">6♦</option>
+                <option value="6♣">6♣</option>
+                <option value="7♠">7♠</option>
+                <option value="7♥">7♥</option>
+                <option value="7♦">7♦</option>
+                <option value="7♣">7♣</option>
+                <option value="8♠">8♠</option>
+                <option value="8♥">8♥</option>
+                <option value="8♦">8♦</option>
+                <option value="8♣">8♣</option>
+                <option value="9♠">9♠</option>
+                <option value="9♥">9♥</option>
+                <option value="9♦">9♦</option>
+                <option value="9♣">9♣</option>
+                <option value="10♠">10♠</option>
+                <option value="10♥">10♥</option>
+                <option value="10♦">10♦</option>
+                <option value="10♣">10♣</option>
+                <option value="J♠">J♠</option>
+                <option value="J♥">J♥</option>
+                <option value="J♦">J♦</option>
+                <option value="J♣">J♣</option>
+                <option value="Q♠">Q♠</option>
+                <option value="Q♥">Q♥</option>
+                <option value="Q♦">Q♦</option>
+                <option value="Q♣">Q♣</option>
+                <option value="K♠">K♠</option>
+                <option value="K♥">K♥</option>
+                <option value="K♦">K♦</option>
+                <option value="K♣">K♣</option>
+              </select>
+
+              <label>Kaart 2:</label>
+              <select id="player-card-2" class="card-select">
+                <option value="">Selecteer kaart</option>
+                <option value="A♠">A♠</option>
+                <option value="A♥">A♥</option>
+                <option value="A♦">A♦</option>
+                <option value="A♣">A♣</option>
+                <option value="2♠">2♠</option>
+                <option value="2♥">2♥</option>
+                <option value="2♦">2♦</option>
+                <option value="2♣">2♣</option>
+                <option value="3♠">3♠</option>
+                <option value="3♥">3♥</option>
+                <option value="3♦">3♦</option>
+                <option value="3♣">3♣</option>
+                <option value="4♠">4♠</option>
+                <option value="4♥">4♥</option>
+                <option value="4♦">4♦</option>
+                <option value="4♣">4♣</option>
+                <option value="5♠">5♠</option>
+                <option value="5♥">5♥</option>
+                <option value="5♦">5♦</option>
+                <option value="5♣">5♣</option>
+                <option value="6♠">6♠</option>
+                <option value="6♥">6♥</option>
+                <option value="6♦">6♦</option>
+                <option value="6♣">6♣</option>
+                <option value="7♠">7♠</option>
+                <option value="7♥">7♥</option>
+                <option value="7♦">7♦</option>
+                <option value="7♣">7♣</option>
+                <option value="8♠">8♠</option>
+                <option value="8♥">8♥</option>
+                <option value="8♦">8♦</option>
+                <option value="8♣">8♣</option>
+                <option value="9♠">9♠</option>
+                <option value="9♥">9♥</option>
+                <option value="9♦">9♦</option>
+                <option value="9♣">9♣</option>
+                <option value="10♠">10♠</option>
+                <option value="10♥">10♥</option>
+                <option value="10♦">10♦</option>
+                <option value="10♣">10♣</option>
+                <option value="J♠">J♠</option>
+                <option value="J♥">J♥</option>
+                <option value="J♦">J♦</option>
+                <option value="J♣">J♣</option>
+                <option value="Q♠">Q♠</option>
+                <option value="Q♥">Q♥</option>
+                <option value="Q♦">Q♦</option>
+                <option value="Q♣">Q♣</option>
+                <option value="K♠">K♠</option>
+                <option value="K♥">K♥</option>
+                <option value="K♦">K♦</option>
+                <option value="K♣">K♣</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <h3>Dealer Kaart</h3>
+            <div class="card-selector">
+              <label>Dealer's zichtbare kaart:</label>
+              <select id="dealer-card" class="card-select">
+                <option value="">Selecteer kaart</option>
+                <option value="A♠">A♠</option>
+                <option value="A♥">A♥</option>
+                <option value="A♦">A♦</option>
+                <option value="A♣">A♣</option>
+                <option value="2♠">2♠</option>
+                <option value="2♥">2♥</option>
+                <option value="2♦">2♦</option>
+                <option value="2♣">2♣</option>
+                <option value="3♠">3♠</option>
+                <option value="3♥">3♥</option>
+                <option value="3♦">3♦</option>
+                <option value="3♣">3♣</option>
+                <option value="4♠">4♠</option>
+                <option value="4♥">4♥</option>
+                <option value="4♦">4♦</option>
+                <option value="4♣">4♣</option>
+                <option value="5♠">5♠</option>
+                <option value="5♥">5♥</option>
+                <option value="5♦">5♦</option>
+                <option value="5♣">5♣</option>
+                <option value="6♠">6♠</option>
+                <option value="6♥">6♥</option>
+                <option value="6♦">6♦</option>
+                <option value="6♣">6♣</option>
+                <option value="7♠">7♠</option>
+                <option value="7♥">7♥</option>
+                <option value="7♦">7♦</option>
+                <option value="7♣">7♣</option>
+                <option value="8♠">8♠</option>
+                <option value="8♥">8♥</option>
+                <option value="8♦">8♦</option>
+                <option value="8♣">8♣</option>
+                <option value="9♠">9♠</option>
+                <option value="9♥">9♥</option>
+                <option value="9♦">9♦</option>
+                <option value="9♣">9♣</option>
+                <option value="10♠">10♠</option>
+                <option value="10♥">10♥</option>
+                <option value="10♦">10♦</option>
+                <option value="10♣">10♣</option>
+                <option value="J♠">J♠</option>
+                <option value="J♥">J♥</option>
+                <option value="J♦">J♦</option>
+                <option value="J♣">J♣</option>
+                <option value="Q♠">Q♠</option>
+                <option value="Q♥">Q♥</option>
+                <option value="Q♦">Q♦</option>
+                <option value="Q♣">Q♣</option>
+                <option value="K♠">K♠</option>
+                <option value="K♥">K♥</option>
+                <option value="K♦">K♦</option>
+                <option value="K♣">K♣</option>
+              </select>
+            </div>
+          </div>
+
+          <button id="get-advice-btn" class="btn btn-primary">Krijg Advies</button>
+        </div>
+
+        <div id="advice-result" class="result-section" style="display: none;">
+          <h3>Strategisch Advies</h3>
+          <div class="advice-card">
+            <div id="advice-action" class="advice-action"></div>
+            <div id="advice-explanation" class="advice-explanation"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- OCR Tab -->
+      <div class="tab-content" id="ocr-tab">
+        <div class="ocr-section">
+          <h3>Schermopname voor Kaartherkenning</h3>
+          <p class="info-text">Upload een screenshot of gebruik schermopname om kaarten automatisch te herkennen</p>
+          
+          <div class="upload-area">
+            <input type="file" id="image-upload" accept="image/*" style="display: none;">
+            <button id="upload-btn" class="btn btn-secondary">Upload Afbeelding</button>
+            <button id="capture-btn" class="btn btn-secondary">Schermopname</button>
+          </div>
+
+          <div id="image-preview" style="display: none;">
+            <h4>Voorbeeld:</h4>
+            <img id="preview-img" alt="Preview">
+            <button id="analyze-btn" class="btn btn-primary">Analyseer Kaarten</button>
+          </div>
+
+          <div id="ocr-result" class="result-section" style="display: none;">
+            <h4>Gedetecteerde Kaarten:</h4>
+            <div id="detected-cards" class="detected-cards"></div>
+          </div>
+
+          <div id="ocr-loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Kaarten herkennen...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Strategy Table Tab -->
+      <div class="tab-content" id="strategy-tab">
+        <div class="strategy-section">
+          <h3>Blackjack Basis Strategie</h3>
+          <p class="info-text">Volledige strategietabel voor optimaal spel</p>
+          
+          <div class="strategy-legend">
+            <span class="legend-item"><span class="legend-color hit">H</span> = Hit (Kaart pakken)</span>
+            <span class="legend-item"><span class="legend-color stand">S</span> = Stand (Blijven staan)</span>
+            <span class="legend-item"><span class="legend-color double">D</span> = Double (Verdubbelen)</span>
+            <span class="legend-item"><span class="legend-color split">P</span> = Split (Splitsen)</span>
+          </div>
+
+          <div class="strategy-tables">
+            <h4>Hard Totals</h4>
+            <p class="table-description">Wanneer u geen Aas heeft of uw Aas telt als 1</p>
+            <div id="hard-strategy-table" class="strategy-table"></div>
+
+            <h4>Soft Totals</h4>
+            <p class="table-description">Wanneer u een Aas heeft dat telt als 11</p>
+            <div id="soft-strategy-table" class="strategy-table"></div>
+
+            <h4>Pair Splitting</h4>
+            <p class="table-description">Wanneer u twee kaarten van dezelfde waarde heeft</p>
+            <div id="pair-strategy-table" class="strategy-table"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <p>Blackjack Helper Desktop v1.0.0 | Voor educatieve doeleinden</p>
+    </footer>
+  </div>
+
+  <script src="src/renderer.js"></script>
+</body>
+</html>
