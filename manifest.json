@@ -32,8 +32,7 @@
       "matches": ["<all_urls>"],
       "js": ["scripts/logic.js", "scripts/ocr.js", "scripts/content.js"],
       "css": ["styles/overlay.css"],
-      "run_at": "document_idle",
-      "all_frames": true
+      "run_at": "document_idle"
     }
   ]
 }

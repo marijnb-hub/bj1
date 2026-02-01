@@ -8,12 +8,28 @@
   // Early exit if we're in an incompatible context
   if (!document.body) {
     console.log('Blackjack Helper: Document body not available yet, waiting...');
-    // Wait for DOM to be ready
+    // Wait for DOM to be ready with better handling
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initializeExtension);
     } else {
-      // DOM is already ready, but body might not be available in some edge cases
-      setTimeout(initializeExtension, 100);
+      // Use MutationObserver to watch for body element
+      const observer = new MutationObserver((mutations, obs) => {
+        if (document.body) {
+          obs.disconnect();
+          initializeExtension();
+        }
+      });
+      observer.observe(document.documentElement, {
+        childList: true,
+        subtree: true
+      });
+      // Fallback timeout after 5 seconds
+      setTimeout(() => {
+        observer.disconnect();
+        if (document.body) {
+          initializeExtension();
+        }
+      }, 5000);
     }
     return;
   }
@@ -34,9 +50,10 @@
         return;
       }
 
-      // Skip if we're in an iframe (unless it's the top frame)
-      if (window !== window.top && !window.location.href.includes('blackjack')) {
-        console.log('Blackjack Helper: In iframe, skipping injection');
+      // Skip if we're in an iframe (not the top-level window)
+      // This saves resources by not injecting into embedded frames
+      if (window !== window.top) {
+        console.log('Blackjack Helper: In iframe, skipping injection to save resources');
         return;
       }
 
