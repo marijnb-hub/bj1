@@ -1,1 +1,148 @@
-# bj1
+# Blackjack Helper Browser Extension
+
+A Google Chrome Web Extension that acts as a real-time assistant for online blackjack players.
+
+## Features
+
+This extension provides a complete blackjack strategy assistant with OCR card recognition capabilities.
+
+### Current Features
+1. **Content Script**: 
+   - Injects an interactive overlay onto the active tab
+   - Displays real-time blackjack strategy recommendations
+   - Toggleable visibility
+
+2. **Basic Strategy Engine**:
+   - Complete implementation of basic blackjack strategy
+   - Handles pairs, soft hands, and hard hands
+   - Provides optimal action recommendations (hit, stand, double, split)
+
+3. **Automatic Screen Capture & OCR**:
+   - 📸 One-click screen capture for automatic card detection
+   - 🎯 Region selection to capture specific card areas
+   - Automatic card recognition using Tesseract.js
+   - No need to manually upload images
+   - Real-time visual preview of captured area
+
+4. **Odds and Expected Value Calculation**:
+   - Real-time odds calculation for win/push/loss
+   - Expected value (EV) for different actions
+   - Dealer bust probability based on upcard
+
+5. **Interactive Interface**:
+   - Tab-based UI with Manual Input and OCR Recognition
+   - Card input with validation
+   - Visual indicators for recommendations
+   - Comprehensive results display
+
+6. **Overlay Design**:
+   - Modern dark-themed overlay
+   - Positioned in the top-right corner of the page
+   - Scrollable content for extensive information
+   - Close button and popup toggle
+
+7. **Popup Interface**:
+   - Extension popup accessible from the browser toolbar
+   - Status indicator
+   - Toggle overlay button
+   - Feature list
+
+8. **Manifest File Configuration**:
+   - Manifest V3 compliant
+   - Configured for Chrome extensions
+   - Includes permissions to read and modify the active tab
+   - Content scripts that inject into all URLs
+
+## Project Structure
+
+```plaintext
+/blackjack-helper
+|-- /assets       # Icons and static assets
+|   |-- icon16.png  # Icon for the extension toolbar (16x16)
+|   |-- icon48.png  # Icon for the extension toolbar (48x48)
+|   |-- icon128.png # Icon for the extension toolbar (128x128)
+|-- /scripts      # JavaScript files for the extension
+|   |-- content.js  # Content script: injected into the browser page to manipulate DOM
+|   |-- logic.js    # Blackjack strategy calculations and game logic
+|   |-- ocr.js      # OCR module for card recognition using Tesseract.js
+|-- /styles       # CSS files for the overlay in the game window
+|   |-- overlay.css
+|-- /popup        # Popup interface when clicking on the extension icon
+|   |-- popup.html
+|   |-- popup.js
+|   |-- popup.css
+|-- manifest.json # Metadata for the web extension
+|-- test.html     # Test page for demonstration
+```
+
+## Installation
+
+1. Clone this repository
+2. Open Chrome and navigate to `chrome://extensions/`
+3. Enable "Developer mode" in the top right
+4. Click "Load unpacked"
+5. Select the repository directory
+
+## Usage
+
+1. After installation, the extension icon will appear in the Chrome toolbar
+2. Navigate to any webpage to see the overlay injected automatically
+3. Click the extension icon to open the popup interface
+4. Use the "Toggle Overlay" button to show/hide the overlay
+
+### Manual Input Mode
+1. Enter your cards separated by commas (e.g., "K,7" or "10,A")
+2. Enter the dealer's visible card
+3. Click "Calculate" to get strategy recommendations
+4. View the recommended action, odds, and expected values
+
+### Automatic Card Detection Mode
+1. Click on the "OCR Recognition" tab
+2. Click "📸 Capture & Detect Cards" to automatically capture the entire screen
+   - OR -
+   Click "🎯 Select Region & Detect" to select a specific area with cards
+3. The extension will automatically detect and recognize cards
+4. Review detected cards and click "Use These Cards" to calculate strategy
+
+**No image upload needed!** The extension automatically sees the cards on your screen.
+
+### Strategy Recommendations
+The extension provides recommendations based on basic blackjack strategy:
+- **HIT**: Take another card
+- **STAND**: Keep your current hand
+- **DOUBLE**: Double your bet and take one more card
+- **SPLIT**: Split pairs into two separate hands
+
+## Next Steps
+
+Future enhancements could include:
+1. ~~Implement card recognition using OCR (e.g., Tesseract.js)~~ ✅ Completed
+2. ~~Develop the basic blackjack strategy in the `logic.js` file and integrate it with `content.js`~~ ✅ Completed
+3. ~~Visualize odds and EV (Expected Value) based on the live game state~~ ✅ Completed
+4. Add card counting functionality
+5. Implement automatic screen region selection for OCR
+6. Add support for different blackjack rule variations
+7. Integrate with specific online blackjack platforms
+8. Add betting strategy recommendations
+
+## Files Description
+
+- **manifest.json**: Defines the extension's metadata, permissions, and configuration
+- **content.js**: Main script that injects the interactive overlay and handles user interactions
+- **logic.js**: Complete blackjack strategy engine with basic strategy, odds, and EV calculations
+- **ocr.js**: OCR module using Tesseract.js for card recognition from images
+- **overlay.css**: Comprehensive styling for the overlay with tabs, inputs, and results visualization
+- **popup.html**, **popup.js**, **popup.css**: The popup interface for the extension
+- **test.html**: Test page for demonstrating the extension
+
+## Version
+
+Current version: 1.0.0
+
+## Technology Stack
+
+- **JavaScript**: Core functionality and game logic
+- **Tesseract.js**: OCR for card recognition
+- **Chrome Extension API**: Browser integration
+- **CSS3**: Modern UI styling
+- **HTML5**: Structure and layout
