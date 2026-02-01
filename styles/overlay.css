@@ -4,7 +4,9 @@
   position: fixed;
   top: 20px;
   right: 20px;
-  width: 300px;
+  width: 350px;
+  max-height: 90vh;
+  overflow-y: auto;
   background-color: rgba(30, 30, 30, 0.95);
   border: 2px solid #4CAF50;
   border-radius: 8px;
@@ -21,6 +23,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .bj-helper-header h3 {
@@ -60,16 +65,225 @@
   padding: 12px;
 }
 
-.bj-helper-status {
-  margin: 0 0 8px 0;
+/* Input Section */
+.bj-input-section {
+  margin-bottom: 15px;
+}
+
+.bj-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: #4CAF50;
+  margin-bottom: 5px;
+  margin-top: 10px;
+}
+
+.bj-label:first-child {
+  margin-top: 0;
+}
+
+.bj-input {
+  width: 100%;
+  padding: 8px;
+  font-size: 13px;
+  border: 1px solid #555;
+  border-radius: 4px;
+  background-color: #2a2a2a;
+  color: #ffffff;
+  box-sizing: border-box;
+}
+
+.bj-input:focus {
+  outline: none;
+  border-color: #4CAF50;
+}
+
+.bj-input::placeholder {
+  color: #888;
+}
+
+.bj-card-input {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 5px;
+}
+
+.bj-card-input .bj-input {
+  flex: 1;
+}
+
+.bj-btn-small {
+  padding: 8px 12px;
+  font-size: 12px;
+  border: none;
+  border-radius: 4px;
+  background-color: #555;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.bj-btn-small:hover {
+  background-color: #666;
+}
+
+.bj-card-display {
+  padding: 8px;
+  margin-bottom: 10px;
+  background-color: #2a2a2a;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #aaa;
+  display: none;
+}
+
+.bj-btn-primary,
+.bj-btn-secondary {
+  width: 48%;
+  padding: 10px;
   font-size: 14px;
   font-weight: 500;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 10px;
+}
+
+.bj-btn-primary {
+  background-color: #4CAF50;
+  color: #ffffff;
+}
+
+.bj-btn-primary:hover {
+  background-color: #45a049;
+}
+
+.bj-btn-secondary {
+  background-color: #555;
+  color: #ffffff;
+  margin-left: 4%;
+}
+
+.bj-btn-secondary:hover {
+  background-color: #666;
+}
+
+/* Results Section */
+.bj-results-section {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #444;
+}
+
+.bj-recommendation {
+  text-align: center;
+  margin-bottom: 15px;
+  padding: 15px;
+  background-color: rgba(76, 175, 80, 0.2);
+  border-radius: 4px;
+  border: 2px solid #4CAF50;
+}
+
+.bj-recommendation h4 {
+  margin: 0 0 8px 0;
+  font-size: 13px;
+  color: #4CAF50;
+  font-weight: 500;
+}
+
+.bj-action-text {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+  text-transform: uppercase;
   color: #4CAF50;
 }
 
-.bj-helper-info {
-  margin: 0;
+.bj-action-hit {
+  color: #FFC107;
+}
+
+.bj-action-stand {
+  color: #4CAF50;
+}
+
+.bj-action-double {
+  color: #2196F3;
+}
+
+.bj-action-split {
+  color: #9C27B0;
+}
+
+.bj-hand-info,
+.bj-odds,
+.bj-ev {
+  margin-bottom: 15px;
+}
+
+.bj-hand-info h4,
+.bj-odds h4,
+.bj-ev h4 {
+  margin: 0 0 8px 0;
   font-size: 13px;
-  color: #cccccc;
-  line-height: 1.5;
+  color: #4CAF50;
+  font-weight: 500;
+}
+
+.bj-hand-info p {
+  margin: 0;
+  font-size: 14px;
+  color: #ffffff;
+}
+
+.bj-stat {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid #333;
+}
+
+.bj-stat:last-child {
+  border-bottom: none;
+}
+
+.bj-stat-label {
+  font-size: 13px;
+  color: #aaa;
+}
+
+.bj-stat-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.bj-stat-win {
+  color: #4CAF50;
+}
+
+.bj-stat-loss {
+  color: #f44336;
+}
+
+/* Scrollbar styling */
+.bj-helper-overlay::-webkit-scrollbar {
+  width: 8px;
+}
+
+.bj-helper-overlay::-webkit-scrollbar-track {
+  background: rgba(50, 50, 50, 0.5);
+  border-radius: 4px;
+}
+
+.bj-helper-overlay::-webkit-scrollbar-thumb {
+  background: #4CAF50;
+  border-radius: 4px;
+}
+
+.bj-helper-overlay::-webkit-scrollbar-thumb:hover {
+  background: #45a049;
 }
