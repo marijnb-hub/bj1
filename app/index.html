@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:;">
+  <title>Blackjack Helper</title>
+  <link rel="stylesheet" href="../styles/app.css">
+</head>
+<body>
+  <div class="app-container">
+    <div class="app-header">
+      <h1>Blackjack Helper</h1>
+      <p class="subtitle">Your desktop blackjack assistant</p>
+    </div>
+    
+    <div class="app-content">
+      <div class="bj-helper-panel">
+        <div class="bj-tabs">
+          <button id="bj-tab-manual" class="bj-tab active">Manual Input</button>
+          <button id="bj-tab-ocr" class="bj-tab">OCR Recognition</button>
+        </div>
+        
+        <div id="bj-manual-panel" class="bj-tab-panel active">
+          <div class="bj-input-section">
+            <label class="bj-label">Your Cards:</label>
+            <div class="bj-card-input">
+              <input type="text" id="bj-player-cards" placeholder="e.g., 10,7 or K,A" class="bj-input">
+              <button id="bj-add-card" class="bj-btn-small">Add Card</button>
+            </div>
+            <div id="bj-player-display" class="bj-card-display"></div>
+            
+            <label class="bj-label">Dealer Card:</label>
+            <input type="text" id="bj-dealer-card" placeholder="e.g., 7 or K" class="bj-input">
+            
+            <button id="bj-calculate" class="bj-btn-primary">Calculate</button>
+            <button id="bj-clear" class="bj-btn-secondary">Clear</button>
+          </div>
+        </div>
+        
+        <div id="bj-ocr-panel" class="bj-tab-panel">
+          <div class="bj-input-section">
+            <label class="bj-label">Automatic Card Detection:</label>
+            <p class="bj-info-text">Click the button below to automatically detect cards from the screen.</p>
+            
+            <button id="bj-capture-screen" class="bj-btn-primary" style="width: 100%; margin-bottom: 10px;">
+              📸 Capture & Detect Cards
+            </button>
+            
+            <div id="bj-ocr-status" class="bj-ocr-status"></div>
+            <div id="bj-ocr-preview" class="bj-ocr-preview"></div>
+            
+            <div id="bj-ocr-results" class="bj-ocr-results" style="display: none;">
+              <label class="bj-label">Detected Cards:</label>
+              <div id="bj-detected-cards" class="bj-card-display"></div>
+              <button id="bj-use-detected" class="bj-btn-primary" style="width: 100%;">Use These Cards</button>
+            </div>
+          </div>
+        </div>
+        
+        <div id="bj-results" class="bj-results-section" style="display: none;">
+          <div class="bj-recommendation">
+            <h4>Recommendation:</h4>
+            <p id="bj-action" class="bj-action-text"></p>
+          </div>
+          
+          <div class="bj-hand-info">
+            <h4>Hand Analysis:</h4>
+            <p id="bj-hand-total"></p>
+          </div>
+          
+          <div class="bj-odds">
+            <h4>Odds:</h4>
+            <div id="bj-odds-display"></div>
+          </div>
+          
+          <div class="bj-ev">
+            <h4>Expected Value:</h4>
+            <div id="bj-ev-display"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load JavaScript modules -->
+  <script src="../scripts/logic.js"></script>
+  <script src="../scripts/ocr.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
