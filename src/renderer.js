@@ -6,6 +6,50 @@ const BlackjackStrategy = require('./src/strategy/blackjackStrategy');
 const ocrModule = new OCRModule();
 const strategy = new BlackjackStrategy();
 
+// Custom notification function
+function showNotification(message, type = 'info') {
+  const notification = document.createElement('div');
+  notification.className = `notification notification-${type}`;
+  notification.textContent = message;
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    background: ${type === 'error' ? '#dc3545' : type === 'success' ? '#28a745' : '#2a5298'};
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    z-index: 10000;
+    max-width: 400px;
+    animation: slideIn 0.3s ease-out;
+  `;
+  
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.style.animation = 'slideOut 0.3s ease-out';
+    setTimeout(() => notification.remove(), 300);
+  }, 3000);
+}
+
+// Add animation styles
+if (!document.getElementById('notification-styles')) {
+  const style = document.createElement('style');
+  style.id = 'notification-styles';
+  style.textContent = `
+    @keyframes slideIn {
+      from { transform: translateX(400px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOut {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(400px); opacity: 0; }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
 // Tab switching
 const tabButtons = document.querySelectorAll('.tab-button');
 const tabContents = document.querySelectorAll('.tab-content');
@@ -36,7 +80,7 @@ document.getElementById('get-advice-btn').addEventListener('click', () => {
   const dealerCard = document.getElementById('dealer-card').value;
 
   if (!playerCard1 || !playerCard2 || !dealerCard) {
-    alert('Selecteer alstublieft alle kaarten');
+    showNotification('Selecteer alstublieft alle kaarten', 'error');
     return;
   }
 
@@ -82,10 +126,13 @@ document.getElementById('capture-btn').addEventListener('click', async () => {
       img.src = source.thumbnail.toDataURL();
       document.getElementById('image-preview').style.display = 'block';
       document.getElementById('ocr-result').style.display = 'none';
+      showNotification('Schermopname succesvol', 'success');
+    } else {
+      showNotification('Geen schermen beschikbaar voor opname', 'error');
     }
   } catch (error) {
     console.error('Error capturing screen:', error);
-    alert('Fout bij het vastleggen van het scherm');
+    showNotification('Kon scherm niet vastleggen. Controleer de machtigingen.', 'error');
   }
 });
 
@@ -93,7 +140,7 @@ document.getElementById('capture-btn').addEventListener('click', async () => {
 document.getElementById('analyze-btn').addEventListener('click', async () => {
   const img = document.getElementById('preview-img');
   if (!img.src) {
-    alert('Upload eerst een afbeelding');
+    showNotification('Upload eerst een afbeelding', 'error');
     return;
   }
 
@@ -118,13 +165,14 @@ document.getElementById('analyze-btn').addEventListener('click', async () => {
         cardsContainer.appendChild(cardChip);
       });
       document.getElementById('ocr-result').style.display = 'block';
+      showNotification(`${cards.length} kaart(en) gedetecteerd`, 'success');
     } else {
-      alert('Geen kaarten gedetecteerd. Probeer een duidelijkere afbeelding.');
+      showNotification('Geen kaarten gevonden. Probeer een duidelijkere afbeelding met zichtbare kaartsymbolen.', 'error');
     }
   } catch (error) {
     console.error('OCR error:', error);
     document.getElementById('ocr-loading').style.display = 'none';
-    alert('Fout bij het analyseren van de afbeelding');
+    showNotification(`Kon afbeelding niet analyseren: ${error.message}. Zorg ervoor dat de afbeelding duidelijke kaartsymbolen bevat.`, 'error');
   }
 });
 

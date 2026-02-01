@@ -48,11 +48,11 @@ class OCRModule {
 
     return matches.map(card => {
       let normalized = card.toUpperCase();
-      // Normalize suit symbols
-      normalized = normalized.replace(/[SH♠]/, '♠')
-                             .replace(/[H♥]/, '♥')
-                             .replace(/[D♦]/, '♦')
-                             .replace(/[C♣]/, '♣');
+      // Normalize suit symbols - separate replacements for each suit
+      normalized = normalized.replace(/S$/, '♠')
+                             .replace(/H$/, '♥')
+                             .replace(/D$/, '♦')
+                             .replace(/C$/, '♣');
       return normalized;
     });
   }
