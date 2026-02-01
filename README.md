@@ -201,9 +201,11 @@ Each source is attempted up to 3 times with exponential backoff.
    - Try the extension on a different website (e.g., the included test.html)
    
 5. **Wait for Loading**: 
-   - First-time OCR use may take 5-10 seconds
+   - First-time OCR use may take 10-15 seconds per attempt
+   - Maximum wait time: Up to 2 minutes in worst-case (9 attempts × 15s timeout + retries)
+   - Typical successful load: 3-10 seconds
    - The extension will automatically retry with different CDN sources
-   - Watch the status messages for progress
+   - Watch the status messages and browser console for progress
 
 **Technical Details**:
 - Primary CDN: `https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js`

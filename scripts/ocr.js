@@ -11,7 +11,6 @@ const TESSERACT_CDN_SOURCES = [
   'https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.1.1/tesseract.min.js'
 ];
 
-let tesseractLoadAttempts = 0;
 const MAX_LOAD_ATTEMPTS = 3;
 
 /**
@@ -39,8 +38,15 @@ async function testNetworkConnectivity() {
     // Try to fetch from a reliable endpoint
     const response = await fetch('https://cdn.jsdelivr.net/npm/tesseract.js@4/package.json', {
       method: 'HEAD',
-      mode: 'no-cors'
+      cache: 'no-cache'
     });
+    
+    // Check if the request was successful
+    if (!response.ok) {
+      console.warn('Network connectivity test failed: Status', response.status);
+      return false;
+    }
+    
     return true;
   } catch (error) {
     console.warn('Network connectivity test failed:', error);
@@ -116,28 +122,28 @@ async function initializeOCR() {
   let lastError = null;
   
   for (let attempt = 0; attempt < MAX_LOAD_ATTEMPTS; attempt++) {
+    console.log(`Load attempt ${attempt + 1} of ${MAX_LOAD_ATTEMPTS}`);
+    
     for (const cdnUrl of TESSERACT_CDN_SOURCES) {
       try {
         await loadTesseractFromCDN(cdnUrl, 15000);
         console.log(`Tesseract.js initialized successfully (attempt ${attempt + 1})`);
-        tesseractLoadAttempts = 0; // Reset counter on success
         return;
       } catch (error) {
         lastError = error;
-        console.warn(`Attempt ${attempt + 1} failed for ${cdnUrl}:`, error.message);
-        
-        // Wait before retry (exponential backoff)
-        if (attempt < MAX_LOAD_ATTEMPTS - 1) {
-          const waitTime = Math.min(1000 * Math.pow(2, attempt), 5000);
-          await new Promise(resolve => setTimeout(resolve, waitTime));
-        }
+        console.warn(`Failed loading from ${cdnUrl}:`, error.message);
       }
+    }
+    
+    // Wait before next full retry cycle (exponential backoff)
+    if (attempt < MAX_LOAD_ATTEMPTS - 1) {
+      const waitTime = Math.min(1000 * Math.pow(2, attempt), 5000);
+      console.log(`Waiting ${waitTime}ms before retry...`);
+      await new Promise(resolve => setTimeout(resolve, waitTime));
     }
   }
   
   // All attempts failed
-  tesseractLoadAttempts++;
-  
   const errorMessage = `Failed to load Tesseract.js after ${MAX_LOAD_ATTEMPTS} attempts from ${TESSERACT_CDN_SOURCES.length} CDN sources.
 
 Possible causes:
