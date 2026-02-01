@@ -175,18 +175,43 @@ Future enhancements could include:
 **Problem**: "Failed to load Tesseract.js" error
 
 **Solution**: 
-The extension loads Tesseract.js from CDN (cdn.jsdelivr.net) dynamically in the page context to work around Chrome Manifest V3 restrictions. If you experience OCR loading issues:
+The extension loads Tesseract.js from multiple CDN sources with automatic retry logic to ensure maximum reliability. The system tries:
+1. jsDelivr CDN (cdn.jsdelivr.net)
+2. unpkg CDN (unpkg.com)
+3. Cloudflare CDN (cdnjs.cloudflare.com)
 
-1. **Check Network Connection**: Ensure you have internet access to download Tesseract.js from the CDN
-2. **Check Browser Console**: Open DevTools (F12) → Console tab to see detailed error messages
-3. **CORS Issues**: The extension injects Tesseract.js into the page context, which should avoid most CORS issues
-4. **Firewall/Network Restrictions**: If your network blocks CDN access, you may need to allowlist `cdn.jsdelivr.net`
-5. **Wait for Loading**: First-time OCR use may take a few seconds to download and initialize Tesseract.js
+Each source is attempted up to 3 times with exponential backoff.
+
+**If you still experience OCR loading issues:**
+
+1. **Check Network Connection**: 
+   - Ensure you have internet access
+   - Test by opening https://cdn.jsdelivr.net in your browser
+   
+2. **Check Browser Console**: 
+   - Open DevTools (F12) → Console tab
+   - Look for detailed error messages with troubleshooting suggestions
+   
+3. **Firewall/Proxy Issues**: 
+   - Disable VPN/proxy temporarily
+   - Allowlist these CDNs: `cdn.jsdelivr.net`, `unpkg.com`, `cdnjs.cloudflare.com`
+   
+4. **Website CSP Restrictions**: 
+   - Some websites have strict Content Security Policies
+   - Try the extension on a different website (e.g., the included test.html)
+   
+5. **Wait for Loading**: 
+   - First-time OCR use may take 5-10 seconds
+   - The extension will automatically retry with different CDN sources
+   - Watch the status messages for progress
 
 **Technical Details**:
-- Tesseract.js is loaded from: `https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js`
-- Worker files are loaded from the same CDN
+- Primary CDN: `https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js`
+- Fallback CDNs: unpkg.com and cdnjs.cloudflare.com
+- Automatic retry: 3 attempts per CDN source with exponential backoff
+- Network pre-check before attempting load
 - The extension uses page context injection to bypass Manifest V3 CSP restrictions
+- Detailed error messages with specific troubleshooting steps
 
 ### Screen Capture Issues
 

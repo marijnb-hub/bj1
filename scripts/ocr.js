@@ -1,67 +1,161 @@
 // OCR module for card recognition using Tesseract.js
-// This module handles image-based card detection
+// This module handles image-based card detection with robust loading and fallback mechanisms
 
 // Note: Tesseract.js will be loaded from CDN by injecting into page context
 // This is necessary because Manifest V3 content scripts cannot load external scripts directly
 
+// Multiple CDN sources for Tesseract.js (fallback if one fails)
+const TESSERACT_CDN_SOURCES = [
+  'https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js',
+  'https://unpkg.com/tesseract.js@4/dist/tesseract.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.1.1/tesseract.min.js'
+];
+
+let tesseractLoadAttempts = 0;
+const MAX_LOAD_ATTEMPTS = 3;
+
 /**
- * Initialize OCR functionality
- * @returns {Promise} - Resolves when Tesseract is ready
+ * Check if Tesseract is already loaded in page context
+ * @returns {boolean} - True if Tesseract is available
  */
-async function initializeOCR() {
-  // Check if Tesseract is available in page context
-  return new Promise((resolve, reject) => {
-    // Check if already loaded
-    const checkTesseract = () => {
-      try {
-        // Try to access Tesseract from page context
-        const script = document.createElement('script');
-        script.textContent = 'window.__tesseractLoaded = typeof Tesseract !== "undefined";';
-        document.documentElement.appendChild(script);
-        script.remove();
-        
-        if (window.__tesseractLoaded) {
-          console.log('Tesseract.js already available');
-          resolve();
-          return true;
-        }
-      } catch (e) {
-        console.log('Tesseract not yet available');
-      }
-      return false;
-    };
-    
-    if (checkTesseract()) {
-      return;
-    }
-    
-    console.log('Loading Tesseract.js from CDN into page context...');
-    
-    // Inject script into page context (not content script context)
+function isTesseractLoaded() {
+  try {
     const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js';
+    script.textContent = 'window.__tesseractLoaded = typeof Tesseract !== "undefined";';
+    document.documentElement.appendChild(script);
+    script.remove();
+    return window.__tesseractLoaded === true;
+  } catch (e) {
+    return false;
+  }
+}
+
+/**
+ * Test network connectivity
+ * @returns {Promise<boolean>} - True if network is accessible
+ */
+async function testNetworkConnectivity() {
+  try {
+    // Try to fetch from a reliable endpoint
+    const response = await fetch('https://cdn.jsdelivr.net/npm/tesseract.js@4/package.json', {
+      method: 'HEAD',
+      mode: 'no-cors'
+    });
+    return true;
+  } catch (error) {
+    console.warn('Network connectivity test failed:', error);
+    return false;
+  }
+}
+
+/**
+ * Load Tesseract.js from a specific CDN source
+ * @param {string} cdnUrl - CDN URL to load from
+ * @param {number} timeout - Timeout in milliseconds
+ * @returns {Promise} - Resolves when loaded
+ */
+function loadTesseractFromCDN(cdnUrl, timeout = 15000) {
+  return new Promise((resolve, reject) => {
+    console.log(`Attempting to load Tesseract.js from: ${cdnUrl}`);
+    
+    const script = document.createElement('script');
+    script.src = cdnUrl;
     script.crossOrigin = 'anonymous';
     
+    const timeoutId = setTimeout(() => {
+      script.remove();
+      reject(new Error(`Timeout loading from ${cdnUrl}`));
+    }, timeout);
+    
     script.onload = () => {
-      console.log('Tesseract.js loaded successfully');
-      // Wait a bit for initialization
+      clearTimeout(timeoutId);
+      console.log(`Tesseract.js loaded successfully from: ${cdnUrl}`);
+      
+      // Verify it's actually loaded
       setTimeout(() => {
-        if (checkTesseract()) {
+        if (isTesseractLoaded()) {
           resolve();
         } else {
-          reject(new Error('Tesseract loaded but not accessible'));
+          reject(new Error('Tesseract loaded but not accessible in page context'));
         }
       }, 100);
     };
     
     script.onerror = (error) => {
-      console.error('Failed to load Tesseract.js', error);
-      reject(new Error('Failed to load Tesseract.js. Check network connection and CORS settings.'));
+      clearTimeout(timeoutId);
+      script.remove();
+      console.error(`Failed to load from ${cdnUrl}:`, error);
+      reject(new Error(`Failed to load from ${cdnUrl}`));
     };
     
     // Append to page's head (not extension context)
     (document.head || document.documentElement).appendChild(script);
   });
+}
+
+/**
+ * Initialize OCR functionality with retry logic and multiple CDN sources
+ * @returns {Promise} - Resolves when Tesseract is ready
+ */
+async function initializeOCR() {
+  // Check if already loaded
+  if (isTesseractLoaded()) {
+    console.log('Tesseract.js already available');
+    return Promise.resolve();
+  }
+  
+  console.log('Initializing Tesseract.js...');
+  
+  // Test network connectivity first
+  const hasNetwork = await testNetworkConnectivity();
+  if (!hasNetwork) {
+    throw new Error('Network connection issue detected. Please check your internet connection and try again.');
+  }
+  
+  // Try loading from multiple CDN sources with retry logic
+  let lastError = null;
+  
+  for (let attempt = 0; attempt < MAX_LOAD_ATTEMPTS; attempt++) {
+    for (const cdnUrl of TESSERACT_CDN_SOURCES) {
+      try {
+        await loadTesseractFromCDN(cdnUrl, 15000);
+        console.log(`Tesseract.js initialized successfully (attempt ${attempt + 1})`);
+        tesseractLoadAttempts = 0; // Reset counter on success
+        return;
+      } catch (error) {
+        lastError = error;
+        console.warn(`Attempt ${attempt + 1} failed for ${cdnUrl}:`, error.message);
+        
+        // Wait before retry (exponential backoff)
+        if (attempt < MAX_LOAD_ATTEMPTS - 1) {
+          const waitTime = Math.min(1000 * Math.pow(2, attempt), 5000);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+        }
+      }
+    }
+  }
+  
+  // All attempts failed
+  tesseractLoadAttempts++;
+  
+  const errorMessage = `Failed to load Tesseract.js after ${MAX_LOAD_ATTEMPTS} attempts from ${TESSERACT_CDN_SOURCES.length} CDN sources.
+
+Possible causes:
+1. Network/Internet connection issues
+2. Firewall or proxy blocking CDN access
+3. Website's Content Security Policy blocking external scripts
+4. CDN services temporarily unavailable
+
+Troubleshooting:
+- Check your internet connection
+- Disable VPN/proxy temporarily
+- Try on a different website
+- Check browser console for detailed errors
+- Ensure cdn.jsdelivr.net, unpkg.com, or cdnjs.cloudflare.com are accessible
+
+Last error: ${lastError?.message || 'Unknown error'}`;
+  
+  throw new Error(errorMessage);
 }
 
 /**
