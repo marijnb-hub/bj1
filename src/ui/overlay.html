@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blackjack Overlay</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      overflow: hidden;
+    }
+
+    .overlay-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.85);
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      border: 2px solid #3498db;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-width: 250px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .overlay-title {
+      font-size: 1.2em;
+      font-weight: bold;
+      margin-bottom: 15px;
+      text-align: center;
+      border-bottom: 2px solid #3498db;
+      padding-bottom: 10px;
+    }
+
+    .overlay-advice {
+      font-size: 2em;
+      font-weight: bold;
+      text-align: center;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 10px 0;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .advice-hit {
+      background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    }
+
+    .advice-stand {
+      background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    }
+
+    .advice-double {
+      background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    }
+
+    .advice-split {
+      background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+    }
+
+    .overlay-details {
+      font-size: 0.9em;
+      margin-top: 10px;
+      text-align: center;
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay-container">
+    <div class="overlay-title">🎴 Blackjack Helper</div>
+    <div id="overlayAdvice" class="overlay-advice advice-hit">HIT</div>
+    <div class="overlay-details" id="overlayDetails">Your: 16 | Dealer: 10</div>
+  </div>
+</body>
+</html>

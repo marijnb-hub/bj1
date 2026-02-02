@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blackjack Helper Vision</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎴 Blackjack Helper Vision</h1>
+      <p class="subtitle">Offline kaartherkenning met OpenCV</p>
+    </header>
+
+    <main>
+      <section class="control-panel">
+        <h2>Besturing</h2>
+        
+        <div class="control-group">
+          <label for="screenSelect">Selecteer scherm/venster:</label>
+          <select id="screenSelect">
+            <option value="">Loading...</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <button id="captureBtn" class="btn btn-primary">Start Capture</button>
+        </div>
+
+        <div id="status" class="status info">Klaar om te starten</div>
+      </section>
+
+      <section class="results-panel">
+        <div class="results-container">
+          <div id="results" class="results-box">
+            <h3>Gedetecteerde Kaarten</h3>
+            <p class="placeholder">Start capture om kaarten te detecteren...</p>
+          </div>
+
+          <div id="advice" class="advice-box">
+            <h3>Strategie Advies</h3>
+            <p class="placeholder">Advies wordt hier getoond...</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="info-panel">
+        <h2>Hoe te gebruiken</h2>
+        <ol>
+          <li>Selecteer het scherm of venster met het blackjack spel</li>
+          <li>Klik op "Start Capture" om de kaartherkenning te starten</li>
+          <li>De applicatie detecteert automatisch de kaarten en geeft strategisch advies</li>
+          <li>Klik op "Stop Capture" om te stoppen</li>
+        </ol>
+
+        <div class="features">
+          <h3>Features</h3>
+          <ul>
+            <li>✅ Volledig offline - geen internetverbinding nodig</li>
+            <li>✅ Klassieke beeldverwerking met OpenCV</li>
+            <li>✅ Template matching voor nauwkeurige kaartherkenning</li>
+            <li>✅ Kleurdetectie voor schoppen, harten, klaveren en ruiten</li>
+            <li>✅ Contourdetectie voor kaarten isolatie</li>
+            <li>✅ Strategisch advies gebaseerd op basis blackjack strategie</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Blackjack Helper Vision v1.0.0 | Gebouwd met Electron & OpenCV</p>
+    </footer>
+  </div>
+
+  <script src="src/renderer.js"></script>
+</body>
+</html>
